@@ -10,21 +10,23 @@ import entity.Book;
 import entity.Borrow;
 import entity.Category;
 import entity.Reader;
+import entity.User;
 import report.BorrowingReport;
 import report.PopularBooksReport;
 import service.BookService;
 import service.BorrowService;
 import service.CategoryService;
 import service.ReaderService;
+import service.UserService;
 import service.impl.BookServiceImpl;
 import service.impl.BorrowServiceImpl;
 import service.impl.CategoryServiceImpl;
 import service.impl.ReaderServiceImpl;
+import service.impl.UserServiceImpl;
 
 public class Main {
     static {
         try {
-            // Load MySQL JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("MySQL JDBC Driver loaded successfully");
         } catch (ClassNotFoundException e) {
@@ -37,38 +39,20 @@ public class Main {
     private static final CategoryService categoryService = new CategoryServiceImpl();
     private static final ReaderService readerService = new ReaderServiceImpl();
     private static final BorrowService borrowService = new BorrowServiceImpl();
+    private static final UserService userService = new UserServiceImpl();
     private static final Scanner scanner = new Scanner(System.in);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final String HORIZONTAL_LINE = "-".repeat(85);
     
+    private static User currentUser = null;
+    
     public static void main(String[] args) {
         while (true) {
             try {
-                showMainMenu();
-                int choice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-                
-                switch (choice) {
-                    case 1:
-                        handleBookMenu();
-                        break;
-                    case 2:
-                        handleCategoryMenu();
-                        break;
-                    case 3:
-                        handleReaderMenu();
-                        break;
-                    case 4:
-                        handleBorrowMenu();
-                        break;
-                    case 5:
-                        handleReportsMenu();
-                        break;
-                    case 6:
-                        System.out.println("Goodbye!");
-                        return;
-                    default:
-                        System.out.println("Invalid option!");
+                if (currentUser == null) {
+                    showLoginMenu();
+                } else {
+                    showMainMenu();
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
@@ -77,15 +61,318 @@ public class Main {
         }
     }
     
-    private static void showMainMenu() {
-        System.out.println("\n=== LIBRARY MANAGEMENT SYSTEM ===");
-        System.out.println("1. Book Management");
-        System.out.println("2. Category Management");
-        System.out.println("3. Reader Management");
-        System.out.println("4. Borrow Management");
-        System.out.println("5. Reports");
-        System.out.println("6. Exit");
+    private static void showLoginMenu() {
+        System.out.println("\n=== LIBRARY MANAGEMENT SYSTEM - LOGIN ===");
+        System.out.println("1. Login");
+        System.out.println("2. Exit");
         System.out.print("Choose an option: ");
+        
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        
+        switch (choice) {
+            case 1:
+                handleLogin();
+                break;
+            case 2:
+                System.out.println("Goodbye!");
+                System.exit(0);
+            default:
+                System.out.println("Invalid option!");
+        }
+    }
+    
+    private static void handleLogin() {
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+        
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+        
+        User user = userService.login(username, password);
+        if (user != null) {
+            currentUser = user;
+            System.out.println("Welcome, " + user.getFullName() + "!");
+        } else {
+            System.out.println("Invalid username or password!");
+        }
+    }
+    
+    private static void showMainMenu() {
+        while (true) {
+            System.out.println("\n=== LIBRARY MANAGEMENT SYSTEM ===");
+            System.out.println("Logged in as: " + currentUser.getFullName() + " (" + currentUser.getRole() + ")");
+            System.out.println("1. Book Management");
+            System.out.println("2. Category Management");
+            System.out.println("3. Reader Management");
+            System.out.println("4. Borrow Management");
+            if (currentUser.getRole() == User.UserRole.ADMIN) {
+                System.out.println("5. Reports");
+                System.out.println("6. User Management");
+                System.out.println("7. Logout");
+                System.out.println("8. Exit");
+            } else {
+                System.out.println("5. Logout");
+                System.out.println("6. Exit");
+            }
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (currentUser.getRole() == User.UserRole.ADMIN) {
+                switch (choice) {
+                    case 1: handleBookMenu(); break;
+                    case 2: handleCategoryMenu(); break;
+                    case 3: handleReaderMenu(); break;
+                    case 4: handleBorrowMenu(); break;
+                    case 5: handleReportsMenu(); break;
+                    case 6: handleUserMenu(); break;
+                    case 7: 
+                        currentUser = null;
+                        return;
+                    case 8:
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid option!");
+                }
+            } else {
+                switch (choice) {
+                    case 1: handleLimitedBookMenu(); break;
+                    case 2: handleLimitedCategoryMenu(); break;
+                    case 3: handleLimitedReaderMenu(); break;
+                    case 4: handleLimitedBorrowMenu(); break;
+                    case 5: 
+                        currentUser = null;
+                        return;
+                    case 6:
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid option!");
+                }
+            }
+        }
+    }
+    
+    // Limited menus for regular users
+    private static void handleLimitedBookMenu() {
+        while (true) {
+            System.out.println("\n=== Book Management ===");
+            System.out.println("1. View all books");
+            System.out.println("2. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    viewAllBooks();
+                    break;
+                case 2:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    private static void handleLimitedCategoryMenu() {
+        while (true) {
+            System.out.println("\n=== Category Management ===");
+            System.out.println("1. View all categories");
+            System.out.println("2. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    viewAllCategories();
+                    break;
+                case 2:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    private static void handleLimitedReaderMenu() {
+        while (true) {
+            System.out.println("\n=== Reader Management ===");
+            System.out.println("1. View all readers");
+            System.out.println("2. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    viewAllReaders();
+                    break;
+                case 2:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    private static void handleLimitedBorrowMenu() {
+        while (true) {
+            System.out.println("\n=== Borrow Management ===");
+            System.out.println("1. View all borrows");
+            System.out.println("2. View reader's borrows");
+            System.out.println("3. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    viewAllBorrows();
+                    break;
+                case 2:
+                    viewReaderBorrows();
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    // User Management Methods
+    private static void handleUserMenu() {
+        while (true) {
+            System.out.println("\n=== User Management ===");
+            System.out.println("1. Add new user");
+            System.out.println("2. View all users");
+            System.out.println("3. Update user");
+            System.out.println("4. Delete user");
+            System.out.println("5. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    addUser();
+                    break;
+                case 2:
+                    viewAllUsers();
+                    break;
+                case 3:
+                    updateUser();
+                    break;
+                case 4:
+                    deleteUser();
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    private static void addUser() {
+        System.out.println("\n=== Add New User ===");
+        
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+        
+        System.out.print("Enter full name: ");
+        String fullName = scanner.nextLine();
+        
+        System.out.print("Enter role (ADMIN/USER): ");
+        User.UserRole role = User.UserRole.valueOf(scanner.nextLine().toUpperCase());
+        
+        User user = new User(0, username, password, fullName, role, new Date());
+        userService.addUser(user);
+        System.out.println("User added successfully!");
+    }
+    
+    private static void viewAllUsers() {
+        System.out.println("\n=== All Users ===");
+        List<User> users = userService.getAllUsers();
+        
+        if (users.isEmpty()) {
+            System.out.println("No users found.");
+            return;
+        }
+    }
+    
+    private static void updateUser() {
+        System.out.println("\n=== Update User ===");
+        
+        System.out.print("Enter user ID to update: ");
+        int userId = scanner.nextInt();
+        scanner.nextLine();
+        
+        User existingUser = userService.findUser(userId);
+        if (existingUser == null) {
+            System.out.println("User not found!");
+            return;
+        }
+        
+        System.out.print("Enter new username (current: " + existingUser.getUsername() + "): ");
+        String username = scanner.nextLine();
+        
+        System.out.print("Enter new password (leave blank to keep current): ");
+        String password = scanner.nextLine();
+        if (password.trim().isEmpty()) {
+            password = existingUser.getPassword();
+        }
+        
+        System.out.print("Enter new full name (current: " + existingUser.getFullName() + "): ");
+        String fullName = scanner.nextLine();
+        
+        System.out.print("Enter new role (current: " + existingUser.getRole() + "): ");
+        User.UserRole role = User.UserRole.valueOf(scanner.nextLine().toUpperCase());
+        
+        User updatedUser = new User(userId, username, password, fullName, role, existingUser.getCreatedAt());
+        userService.updateUser(updatedUser);
+        System.out.println("User updated successfully!");
+    }
+    
+    private static void deleteUser() {
+        System.out.println("\n=== Delete User ===");
+        
+        System.out.print("Enter user ID to delete: ");
+        int userId = scanner.nextInt();
+        
+        if (userId == currentUser.getUserId()) {
+            System.out.println("Cannot delete your own account!");
+            return;
+        }
+        
+        User existingUser = userService.findUser(userId);
+        if (existingUser == null) {
+            System.out.println("User not found!");
+            return;
+        }
+        
+        System.out.print("Are you sure you want to delete this user? (y/n): ");
+        String confirm = scanner.next();
+        
+        if (confirm.equalsIgnoreCase("y")) {
+            userService.deleteUser(userId);
+            System.out.println("User deleted successfully!");
+        } else {
+            System.out.println("Delete operation cancelled.");
+        }
     }
     
     // Book Management Methods
@@ -506,8 +793,9 @@ public class Main {
     
     // Borrow Operations
     private static void borrowBook() {
-        System.out.println("\n=== Borrow Book ===");
+        System.out.println("\n=== Borrow Books ===");
         
+        // Get reader information
         System.out.print("Enter reader ID: ");
         int readerId = scanner.nextInt();
         Reader reader = readerService.findReader(readerId);
@@ -516,31 +804,62 @@ public class Main {
             return;
         }
         
-        System.out.print("Enter book ID: ");
-        int bookId = scanner.nextInt();
-        Book book = bookService.findBook(bookId);
-        if (book == null) {
-            System.out.println("Book not found!");
+        // Get number of books to borrow
+        System.out.print("How many books do you want to borrow? ");
+        int numberOfBooks = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        
+        if (numberOfBooks <= 0) {
+            System.out.println("Invalid number of books!");
             return;
         }
         
-        if (book.getQuantity() <= 0) {
-            System.out.println("Book is not available!");
-            return;
-        }
-        
-        scanner.nextLine();
+        // Get expected return date (same for all books)
         System.out.print("Enter expected return date (dd/MM/yyyy): ");
         Date expectedReturnDate = parseDate(scanner.nextLine());
         
-        Borrow borrow = new Borrow(0, reader, book, new Date(), expectedReturnDate, null);
-        borrowService.borrowBook(borrow);
+        // Process each book
+        for (int i = 0; i < numberOfBooks; i++) {
+            System.out.printf("\nEnter book ID for book %d of %d: ", (i + 1), numberOfBooks);
+            int bookId = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            Book book = bookService.findBook(bookId);
+            if (book == null) {
+                System.out.println("Book not found! Skipping this book.");
+                continue;
+            }
+            
+            if (book.getQuantity() <= 0) {
+                System.out.println("Book is not available! Skipping this book.");
+                continue;
+            }
+            
+            try {
+                // Create and process the borrow record
+                Borrow borrow = new Borrow(0, reader, book, new Date(), expectedReturnDate, null);
+                borrowService.borrowBook(borrow);
+                
+                // Update book quantity
+                book.setQuantity(book.getQuantity() - 1);
+                bookService.updateBook(book);
+                
+                System.out.printf("Successfully borrowed: %s\n", book.getTitle());
+                
+            } catch (Exception e) {
+                System.out.printf("Error borrowing book '%s': %s\n", 
+                                book.getTitle(), e.getMessage());
+            }
+        }
         
-        // Update book quantity
-        book.setQuantity(book.getQuantity() - 1);
-        bookService.updateBook(book);
-        
-        System.out.println("Book borrowed successfully!");
+        // Show summary of reader's current borrows
+        System.out.println("\n=== Current Borrows for " + reader.getFullName() + " ===");
+        List<Borrow> borrows = borrowService.getBorrowsByReader(readerId);
+        for (Borrow borrow : borrows) {
+            if (borrow.getActualReturnDate() == null) { // Show only active borrows
+                System.out.println(borrow);
+            }
+        }
     }
     
     private static void returnBook() {

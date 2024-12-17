@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,9 +141,28 @@ public class BorrowDAOImpl implements BorrowDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
+            // Print table header
+            System.out.println("\n" + "=".repeat(120));
+            System.out.printf("| %-5s | %-20s | %-25s | %-12s | %-12s | %-12s |\n",
+                    "ID", "Reader Name", "Book Title", "Borrow Date", "Expected", "Returned");
+            System.out.println("-".repeat(120));
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             while (rs.next()) {
-                borrows.add(extractBorrowFromResultSet(rs));
+                Borrow borrow = extractBorrowFromResultSet(rs);
+                borrows.add(borrow);
+                // Print each row
+                System.out.printf("| %-5d | %-20s | %-25s | %-12s | %-12s | %-12s |\n",
+                    borrow.getBorrowId(),
+                    truncateString(borrow.getReader().getFullName(), 20),
+                    truncateString(borrow.getBook().getTitle(), 25),
+                    dateFormat.format(borrow.getBorrowDate()),
+                    dateFormat.format(borrow.getExpectedReturnDate()),
+                    borrow.getActualReturnDate() != null ? 
+                        dateFormat.format(borrow.getActualReturnDate()) : "Not returned");
             }
+            System.out.println("=".repeat(120));
+            
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving borrow records: " + e.getMessage(), e);
         }
@@ -212,5 +232,10 @@ public class BorrowDAOImpl implements BorrowDAO {
             rs.getDate("expected_return_date"),
             rs.getDate("actual_return_date")
         );
+    }
+
+    private String truncateString(String str, int length) {
+        if (str == null) return "";
+        return str.length() <= length ? str : str.substring(0, length - 3) + "...";
     }
 } 

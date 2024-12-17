@@ -35,3 +35,15 @@ INSERT INTO borrows (reader_id, book_id, borrow_date, expected_return_date, actu
 (3, 4, '2024-02-10', '2024-02-24', NULL),
 (4, 2, '2024-02-15', '2024-02-29', NULL),
 (1, 5, '2024-02-20', '2024-03-05', NULL); 
+
+-- Password: admin123
+INSERT INTO users (username, password, full_name, role) 
+VALUES ('admin', 'admin123', 'System Administrator', 'ADMIN');
+
+-- Password: user123
+INSERT INTO users (username, password, full_name, role) 
+VALUES ('john', 'user123', 'John Doe', 'USER');
+
+-- Password: user123
+INSERT INTO users (username, password, full_name, role) 
+VALUES ('jane', 'user123', 'Jane Smith', 'USER');

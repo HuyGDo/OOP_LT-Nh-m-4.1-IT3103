@@ -1,12 +1,16 @@
 package dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import dao.CategoryDAO;
 import entity.Category;
 import utils.DatabaseConnection;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CategoryDAOImpl implements CategoryDAO {
     @Override
@@ -80,9 +84,21 @@ public class CategoryDAOImpl implements CategoryDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
+            // Print table header
+            System.out.println("\n" + "=".repeat(40));
+            System.out.printf("| %-10s | %-25s |\n", "ID", "Category Name");
+            System.out.println("-".repeat(40));
+            
             while (rs.next()) {
-                categories.add(extractCategoryFromResultSet(rs));
+                Category category = extractCategoryFromResultSet(rs);
+                categories.add(category);
+                // Print each row
+                System.out.printf("| %-10d | %-25s |\n", 
+                    category.getCategoryId(), 
+                    category.getCategoryName());
             }
+            System.out.println("=".repeat(40));
+            
         } catch (SQLException e) {
             throw new RuntimeException("Error getting all categories", e);
         }

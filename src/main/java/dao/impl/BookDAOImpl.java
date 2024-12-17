@@ -1,8 +1,13 @@
 package dao.impl;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import dao.BookDAO;
 import entity.Book;
 import entity.Category;
@@ -129,9 +134,26 @@ public class BookDAOImpl implements BookDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
+            // Print table header
+            System.out.println("\n" + "=".repeat(100));
+            System.out.printf("| %-5s | %-25s | %-20s | %-15s | %-8s | %-15s |\n",
+                    "ID", "Title", "Author", "Publisher", "Quantity", "Category");
+            System.out.println("-".repeat(100));
+            
             while (rs.next()) {
-                books.add(extractBookFromResultSet(rs));
+                Book book = extractBookFromResultSet(rs);
+                books.add(book);
+                // Print each row
+                System.out.printf("| %-5d | %-25s | %-20s | %-15s | %-8d | %-15s |\n",
+                    book.getBookId(),
+                    truncateString(book.getTitle(), 25),
+                    truncateString(book.getAuthor(), 20),
+                    truncateString(book.getPublisher(), 15),
+                    book.getQuantity(),
+                    truncateString(book.getCategory().getCategoryName(), 15));
             }
+            System.out.println("=".repeat(100));
+            
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving books: " + e.getMessage(), e);
         }
@@ -152,5 +174,10 @@ public class BookDAOImpl implements BookDAO {
             rs.getInt("quantity"),
             category
         );
+    }
+
+    private String truncateString(String str, int length) {
+        if (str == null) return "";
+        return str.length() <= length ? str : str.substring(0, length - 3) + "...";
     }
 } 

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,9 +121,25 @@ public class ReaderDAOImpl implements ReaderDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
+            // Print table header
+            System.out.println("\n" + "=".repeat(85));
+            System.out.printf("| %-5s | %-25s | %-15s | %-30s |\n",
+                    "ID", "Full Name", "Birth Date", "Address");
+            System.out.println("-".repeat(85));
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             while (rs.next()) {
-                readers.add(extractReaderFromResultSet(rs));
+                Reader reader = extractReaderFromResultSet(rs);
+                readers.add(reader);
+                // Print each row
+                System.out.printf("| %-5d | %-25s | %-15s | %-30s |\n",
+                    reader.getReaderId(),
+                    truncateString(reader.getFullName(), 25),
+                    dateFormat.format(reader.getBirthDate()),
+                    truncateString(reader.getAddress(), 30));
             }
+            System.out.println("=".repeat(85));
+            
         } catch (SQLException e) {
             throw new RuntimeException("Error getting all readers", e);
         }
@@ -136,5 +153,10 @@ public class ReaderDAOImpl implements ReaderDAO {
             rs.getDate("birth_date"),
             rs.getString("address")
         );
+    }
+
+    private String truncateString(String str, int length) {
+        if (str == null) return "";
+        return str.length() <= length ? str : str.substring(0, length - 3) + "...";
     }
 } 

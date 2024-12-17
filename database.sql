@@ -32,4 +32,13 @@ CREATE TABLE borrows (
     actual_return_date DATE,
     FOREIGN KEY (reader_id) REFERENCES readers(reader_id),
     FOREIGN KEY (book_id) REFERENCES books(book_id)
+);
+
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role ENUM('ADMIN', 'USER') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
