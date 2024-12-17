@@ -5,9 +5,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import entity.*;
-import service.*;
-import service.impl.*;
+
+import entity.Book;
+import entity.Borrow;
+import entity.Category;
+import entity.Reader;
+import report.BorrowingReport;
+import report.PopularBooksReport;
+import service.BookService;
+import service.BorrowService;
+import service.CategoryService;
+import service.ReaderService;
+import service.impl.BookServiceImpl;
+import service.impl.BorrowServiceImpl;
+import service.impl.CategoryServiceImpl;
+import service.impl.ReaderServiceImpl;
 
 public class Main {
     static {
@@ -27,6 +39,7 @@ public class Main {
     private static final BorrowService borrowService = new BorrowServiceImpl();
     private static final Scanner scanner = new Scanner(System.in);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private static final String HORIZONTAL_LINE = "-".repeat(85);
     
     public static void main(String[] args) {
         while (true) {
@@ -49,6 +62,9 @@ public class Main {
                         handleBorrowMenu();
                         break;
                     case 5:
+                        handleReportsMenu();
+                        break;
+                    case 6:
                         System.out.println("Goodbye!");
                         return;
                     default:
@@ -67,7 +83,8 @@ public class Main {
         System.out.println("2. Category Management");
         System.out.println("3. Reader Management");
         System.out.println("4. Borrow Management");
-        System.out.println("5. Exit");
+        System.out.println("5. Reports");
+        System.out.println("6. Exit");
         System.out.print("Choose an option: ");
     }
     
@@ -204,6 +221,33 @@ public class Main {
                     viewReaderBorrows();
                     break;
                 case 5:
+                    return;
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+    
+    // Reports Management Methods
+    private static void handleReportsMenu() {
+        while (true) {
+            System.out.println("\n=== Reports ===");
+            System.out.println("1. Borrowing Activity Report");
+            System.out.println("2. Popular Books Report");
+            System.out.println("3. Back to main menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1:
+                    generateBorrowingReport();
+                    break;
+                case 2:
+                    generatePopularBooksReport();
+                    break;
+                case 3:
                     return;
                 default:
                     System.out.println("Invalid option!");
@@ -568,6 +612,24 @@ public class Main {
             return dateFormat.parse(dateStr);
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use dd/MM/yyyy");
+        }
+    }
+    
+    private static void generateBorrowingReport() {
+        BorrowingReport report = new BorrowingReport();
+        List<String> reportLines = report.generateReport();
+        System.out.println();
+        for (String line : reportLines) {
+            System.out.println(line);
+        }
+    }
+    
+    private static void generatePopularBooksReport() {
+        PopularBooksReport report = new PopularBooksReport();
+        List<String> reportLines = report.generateReport();
+        System.out.println();
+        for (String line : reportLines) {
+            System.out.println(line);
         }
     }
 } 
