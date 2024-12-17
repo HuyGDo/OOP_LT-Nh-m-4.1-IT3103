@@ -8,13 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.BookDAO;
 import entity.Book;
 import entity.Category;
 import utils.DatabaseConnection;
 
-public class BookDAOImpl implements BookDAO {
-    @Override
+public class BookDAOImpl {
     public void add(Book book) {
         String sql = "INSERT INTO books (title, author, publisher, quantity, category_id) VALUES (?, ?, ?, ?, ?)";
         
@@ -45,7 +43,6 @@ public class BookDAOImpl implements BookDAO {
         }
     }
 
-    @Override
     public void update(Book book) {
         String sql = "UPDATE books SET title = ?, author = ?, publisher = ?, quantity = ?, category_id = ? " +
                     "WHERE book_id = ?";
@@ -69,7 +66,6 @@ public class BookDAOImpl implements BookDAO {
         }
     }
 
-    @Override
     public void delete(int bookId) {
         // First check if book is currently borrowed
         String checkBorrowsSql = "SELECT COUNT(*) FROM borrows WHERE book_id = ? AND actual_return_date IS NULL";
@@ -99,7 +95,6 @@ public class BookDAOImpl implements BookDAO {
         }
     }
 
-    @Override
     public Book getById(int bookId) {
         String sql = "SELECT b.*, c.category_name " +
                     "FROM books b " +
@@ -122,7 +117,6 @@ public class BookDAOImpl implements BookDAO {
         return null;
     }
 
-    @Override
     public List<Book> getAll() {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT b.*, c.category_name " +

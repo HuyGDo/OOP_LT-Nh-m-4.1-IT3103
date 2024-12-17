@@ -1,22 +1,19 @@
 package service.impl;
 
-import dao.BorrowDAO;
-import dao.impl.BorrowDAOImpl;
-import entity.Borrow;
-import service.BorrowService;
 import java.util.Date;
 import java.util.List;
 
-public class BorrowServiceImpl implements BorrowService {
-    private final BorrowDAO borrowDAO = new BorrowDAOImpl();
+import dao.impl.BorrowDAOImpl;
+import entity.Borrow;
+
+public class BorrowServiceImpl {
+    private final BorrowDAOImpl borrowDAO = new BorrowDAOImpl();
     
-    @Override
     public void borrowBook(Borrow borrow) {
         validateBorrow(borrow);
         borrowDAO.add(borrow);
     }
     
-    @Override
     public void returnBook(int borrowId) {
         Borrow borrow = borrowDAO.getById(borrowId);
         if (borrow == null) {
@@ -27,7 +24,6 @@ public class BorrowServiceImpl implements BorrowService {
         borrowDAO.update(borrow);
     }
     
-    @Override
     public void deleteBorrowRecord(int borrowId) {
         if (borrowId <= 0) {
             throw new IllegalArgumentException("Invalid borrow ID");
@@ -35,7 +31,6 @@ public class BorrowServiceImpl implements BorrowService {
         borrowDAO.delete(borrowId);
     }
     
-    @Override
     public Borrow findBorrow(int borrowId) {
         if (borrowId <= 0) {
             throw new IllegalArgumentException("Invalid borrow ID");
@@ -43,12 +38,10 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowDAO.getById(borrowId);
     }
     
-    @Override
     public List<Borrow> getAllBorrows() {
         return borrowDAO.getAll();
     }
     
-    @Override
     public List<Borrow> getBorrowsByReader(int readerId) {
         if (readerId <= 0) {
             throw new IllegalArgumentException("Invalid reader ID");

@@ -1,27 +1,23 @@
 package service.impl;
 
-import dao.ReaderDAO;
-import dao.impl.ReaderDAOImpl;
-import entity.Reader;
-import service.ReaderService;
 import java.util.List;
 
-public class ReaderServiceImpl implements ReaderService {
-    private final ReaderDAO readerDAO = new ReaderDAOImpl();
+import dao.impl.ReaderDAOImpl;
+import entity.Reader;
+
+public class ReaderServiceImpl {
+    private final ReaderDAOImpl readerDAO = new ReaderDAOImpl();
     
-    @Override
     public void addReader(Reader reader) {
         validateReader(reader);
         readerDAO.add(reader);
     }
     
-    @Override
     public void updateReader(Reader reader) {
         validateReader(reader);
         readerDAO.update(reader);
     }
     
-    @Override
     public void deleteReader(int readerId) {
         if (readerId <= 0) {
             throw new IllegalArgumentException("Invalid reader ID");
@@ -29,7 +25,6 @@ public class ReaderServiceImpl implements ReaderService {
         readerDAO.delete(readerId);
     }
     
-    @Override
     public Reader findReader(int readerId) {
         if (readerId <= 0) {
             throw new IllegalArgumentException("Invalid reader ID");
@@ -37,7 +32,6 @@ public class ReaderServiceImpl implements ReaderService {
         return readerDAO.getById(readerId);
     }
     
-    @Override
     public List<Reader> getAllReaders() {
         return readerDAO.getAll();
     }

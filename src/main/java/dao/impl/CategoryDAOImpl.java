@@ -8,12 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.CategoryDAO;
 import entity.Category;
 import utils.DatabaseConnection;
 
-public class CategoryDAOImpl implements CategoryDAO {
-    @Override
+public class CategoryDAOImpl {
     public void add(Category category) {
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
         
@@ -27,7 +25,6 @@ public class CategoryDAOImpl implements CategoryDAO {
         }
     }
 
-    @Override
     public void update(Category category) {
         String sql = "UPDATE categories SET category_name=? WHERE category_id=?";
         
@@ -42,7 +39,6 @@ public class CategoryDAOImpl implements CategoryDAO {
         }
     }
 
-    @Override
     public void delete(int categoryId) {
         String sql = "DELETE FROM categories WHERE category_id=?";
         
@@ -56,7 +52,6 @@ public class CategoryDAOImpl implements CategoryDAO {
         }
     }
 
-    @Override
     public Category getById(int categoryId) {
         String sql = "SELECT * FROM categories WHERE category_id=?";
         
@@ -75,7 +70,6 @@ public class CategoryDAOImpl implements CategoryDAO {
         return null;
     }
 
-    @Override
     public List<Category> getAll() {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT * FROM categories";

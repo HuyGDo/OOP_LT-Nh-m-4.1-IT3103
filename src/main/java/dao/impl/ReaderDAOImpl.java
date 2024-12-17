@@ -9,12 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.ReaderDAO;
 import entity.Reader;
 import utils.DatabaseConnection;
 
-public class ReaderDAOImpl implements ReaderDAO {
-    @Override
+public class ReaderDAOImpl {
     public void add(Reader reader) {
         String sql = "INSERT INTO readers (full_name, birth_date, address) VALUES (?, ?, ?)";
         
@@ -43,7 +41,6 @@ public class ReaderDAOImpl implements ReaderDAO {
         }
     }
 
-    @Override
     public void update(Reader reader) {
         String sql = "UPDATE readers SET full_name=?, birth_date=?, address=? WHERE reader_id=?";
         
@@ -64,7 +61,6 @@ public class ReaderDAOImpl implements ReaderDAO {
         }
     }
 
-    @Override
     public void delete(int readerId) {
         // First check if reader has any active borrows
         String checkBorrows = "SELECT COUNT(*) FROM borrows WHERE reader_id = ? AND actual_return_date IS NULL";
@@ -93,7 +89,6 @@ public class ReaderDAOImpl implements ReaderDAO {
         }
     }
 
-    @Override
     public Reader getById(int readerId) {
         String sql = "SELECT * FROM readers WHERE reader_id=?";
         
@@ -112,7 +107,6 @@ public class ReaderDAOImpl implements ReaderDAO {
         return null;
     }
 
-    @Override
     public List<Reader> getAll() {
         List<Reader> readers = new ArrayList<>();
         String sql = "SELECT * FROM readers";

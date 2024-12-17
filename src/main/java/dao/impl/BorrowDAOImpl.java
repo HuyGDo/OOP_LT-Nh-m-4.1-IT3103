@@ -9,20 +9,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.BookDAO;
-import dao.BorrowDAO;
-import dao.ReaderDAO;
 import entity.Book;
 import entity.Borrow;
 import entity.Category;
 import entity.Reader;
 import utils.DatabaseConnection;
 
-public class BorrowDAOImpl implements BorrowDAO {
-    private final BookDAO bookDAO = new BookDAOImpl();
-    private final ReaderDAO readerDAO = new ReaderDAOImpl();
+public class BorrowDAOImpl {
+    private final BookDAOImpl bookDAO = new BookDAOImpl();
+    private final ReaderDAOImpl readerDAO = new ReaderDAOImpl();
 
-    @Override
     public void add(Borrow borrow) {
         String sql = "INSERT INTO borrows (reader_id, book_id, borrow_date, expected_return_date, actual_return_date) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -55,7 +51,6 @@ public class BorrowDAOImpl implements BorrowDAO {
         }
     }
 
-    @Override
     public void update(Borrow borrow) {
         String sql = "UPDATE borrows SET reader_id = ?, book_id = ?, borrow_date = ?, " +
                     "expected_return_date = ?, actual_return_date = ? WHERE borrow_id = ?";
@@ -80,7 +75,6 @@ public class BorrowDAOImpl implements BorrowDAO {
         }
     }
 
-    @Override
     public void delete(int borrowId) {
         String sql = "DELETE FROM borrows WHERE borrow_id = ?";
         
@@ -98,7 +92,6 @@ public class BorrowDAOImpl implements BorrowDAO {
         }
     }
 
-    @Override
     public Borrow getById(int borrowId) {
         String sql = "SELECT b.*, r.full_name, r.birth_date, r.address, " +
                     "bk.title, bk.author, bk.publisher, bk.quantity, " +
@@ -125,7 +118,6 @@ public class BorrowDAOImpl implements BorrowDAO {
         return null;
     }
 
-    @Override
     public List<Borrow> getAll() {
         List<Borrow> borrows = new ArrayList<>();
         String sql = "SELECT b.*, r.full_name, r.birth_date, r.address, " +
@@ -169,7 +161,6 @@ public class BorrowDAOImpl implements BorrowDAO {
         return borrows;
     }
 
-    @Override
     public List<Borrow> getByReaderId(int readerId) {
         List<Borrow> borrows = new ArrayList<>();
         String sql = "SELECT b.*, r.full_name, r.birth_date, r.address, " +

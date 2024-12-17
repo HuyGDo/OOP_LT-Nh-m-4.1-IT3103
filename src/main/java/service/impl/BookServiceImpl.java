@@ -1,27 +1,23 @@
 package service.impl;
 
-import dao.BookDAO;
-import dao.impl.BookDAOImpl;
-import entity.Book;
-import service.BookService;
 import java.util.List;
 
-public class BookServiceImpl implements BookService {
-    private final BookDAO bookDAO = new BookDAOImpl();
+import dao.impl.BookDAOImpl;
+import entity.Book;
+
+public class BookServiceImpl {
+    private final BookDAOImpl bookDAO = new BookDAOImpl();
     
-    @Override
     public void addBook(Book book) {
         validateBook(book);
         bookDAO.add(book);
     }
     
-    @Override
     public void updateBook(Book book) {
         validateBook(book);
         bookDAO.update(book);
     }
     
-    @Override
     public void deleteBook(int bookId) {
         if (bookId <= 0) {
             throw new IllegalArgumentException("Invalid book ID");
@@ -29,7 +25,6 @@ public class BookServiceImpl implements BookService {
         bookDAO.delete(bookId);
     }
     
-    @Override
     public Book findBook(int bookId) {
         if (bookId <= 0) {
             throw new IllegalArgumentException("Invalid book ID");
@@ -37,7 +32,6 @@ public class BookServiceImpl implements BookService {
         return bookDAO.getById(bookId);
     }
     
-    @Override
     public List<Book> getAllBooks() {
         return bookDAO.getAll();
     }

@@ -13,11 +13,6 @@ import entity.Reader;
 import entity.User;
 import report.BorrowingReport;
 import report.PopularBooksReport;
-import service.BookService;
-import service.BorrowService;
-import service.CategoryService;
-import service.ReaderService;
-import service.UserService;
 import service.impl.BookServiceImpl;
 import service.impl.BorrowServiceImpl;
 import service.impl.CategoryServiceImpl;
@@ -35,11 +30,11 @@ public class Main {
         }
     }
 
-    private static final BookService bookService = new BookServiceImpl();
-    private static final CategoryService categoryService = new CategoryServiceImpl();
-    private static final ReaderService readerService = new ReaderServiceImpl();
-    private static final BorrowService borrowService = new BorrowServiceImpl();
-    private static final UserService userService = new UserServiceImpl();
+    private static final BookServiceImpl bookService = new BookServiceImpl();
+    private static final CategoryServiceImpl categoryService = new CategoryServiceImpl();
+    private static final ReaderServiceImpl readerService = new ReaderServiceImpl();
+    private static final BorrowServiceImpl borrowService = new BorrowServiceImpl();
+    private static final UserServiceImpl userService = new UserServiceImpl();
     private static final Scanner scanner = new Scanner(System.in);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final String HORIZONTAL_LINE = "-".repeat(85);
